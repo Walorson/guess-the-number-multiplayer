@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "rootDir": "./src/src-scripts",
+        "outDir": "./src/dist-scripts",
+        "target": "ES6",
+    },
+    "include": ["./src/src-scripts/**/*"]
+}

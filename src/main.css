@@ -1,0 +1,31 @@
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    flex-direction: column;
+    gap: 10px;
+}
+#rooms {
+    border: 3px solid black;
+    height: 80%;
+    width: 500px;
+}
+.room {
+    background-color: #ddd;
+    padding: 15px 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+.room:nth-of-type(2n) {
+    background-color: #ccc;
+}
+#nickname {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+}
