@@ -3,19 +3,22 @@ import { io } from "socket.io-client";
 const socket = io("http://127.0.0.1:3000");
 const nicknameDiv = document.getElementById("nickname");
 const hostBtn = document.getElementById("host-button");
+
 let username = "";
-let nicknamesList = ["TAZOSY", "SPERMOLUD", "FLOATING", "NOVEMBER", "WIESŁAW", "SZYNKA", "FOREVER", "PYSIEK", "KASZTAN", "KURWIAK", "SZEWCZON"];
+let nicknamesList = ["TAZOSY", "WiRUS", "FLOATING", "NOVEMBER", "WIESŁAW", "SZYNKA", "FOREVER", "PYSIEK", "KASZTAN", "KURWIAK", "SZEWCZON", "POST", "DIABEL", "AWEJNIAK"];
 
 socket.on("connect", () => {
     const rand = Math.floor(Math.random()*11);
     username = nicknamesList[rand];
     nicknameDiv.innerHTML = `Witaj <i><b>${username}</b></i>!`;
+
+    localStorage.setItem("username", username);
 });
 
 const roomsDiv = document.getElementById("rooms");
-function addNewRoom(name) 
+function addNewRoom(name, hostUsername) 
 {
-    roomsDiv.innerHTML += `<div class="room"><b>${name} <i>1/2</i></b><button class="join">Join</button></div>`;
+    roomsDiv.innerHTML += `<div class="room" data-hostUsername="${hostUsername}" data-roomName="${name}"><b>${name} <i>1/2</i></b><button>Join</button></div>`;
 }
 
 function hostGame() 
@@ -25,26 +28,32 @@ function hostGame()
 
     hideRoomList();
     createText("OCZEKIWANIE NA GRACZA!");
+
+    localStorage.setItem("roomName", roomName);
 }
 
 hostBtn.addEventListener("click", hostGame)
 
-socket.on("hostGame", (roomName, hostUsername) => {
-    addNewRoom(roomName);
-    document.querySelector(".join").onclick = () => 
-    { 
-        socket.emit("roomJoin", roomName, username);
-
-        hideRoomList();
-        createText(`Dołączyłeś do <b>${hostUsername}</b>`);
-        createAcceptButton();
-    }
+socket.on("hostGame", (roomName, hostUsername) => 
+{
+    addNewRoom(roomName, hostUsername);
 }); 
 
 socket.on("userJoinToRoom", (username) => {
     createText(`<b>${username}</b> dołączył do gry! YEEEAH`);
     createAcceptButton();
 })
+
+function joinRoom(roomName, hostUsername)
+{
+    socket.emit("roomJoin", roomName, username);
+
+    hideRoomList();
+    createText(`Dołączyłeś do <b>${hostUsername}</b>`);
+    createAcceptButton();
+
+    localStorage.setItem("roomName", roomName);
+}
 
 function createAcceptButton() 
 {
@@ -55,6 +64,7 @@ function createAcceptButton()
     }
     document.body.append(btn);
 }
+
 
 function createText(text)
 {
@@ -68,3 +78,31 @@ function hideRoomList()
     roomsDiv.style.display = "none";
     hostBtn.style.display = "none";
 }
+
+function refreshRoomsList()
+{
+    socket.emit("getRoomsList");
+}
+
+socket.on("sendRoomsList", (roomsList) => {
+    roomsDiv.innerHTML = "";
+    Object.values(roomsList).forEach(room => {
+        addNewRoom(room.name, room.hostUsername);
+    });
+
+    document.querySelectorAll(".room").forEach(room => {
+        room.querySelector("button").onclick = () => {
+            joinRoom(room.getAttribute("data-roomName"), room.getAttribute("data-hostUsername"));
+        }
+    });
+});
+
+setInterval(refreshRoomsList, 1500);
+
+socket.on("startGameHost", () => {
+    location.href = "./game-host.html";
+});
+
+socket.on("startGameGuesser", () => {
+    location.href = "./game-guesser.html";
+});
