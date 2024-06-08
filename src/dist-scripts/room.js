@@ -79,9 +79,14 @@ function hideRoomList()
     hostBtn.style.display = "none";
 }
 
+let pingInterval;
+let ping = 0;
+
 function refreshRoomsList()
 {
     socket.emit("getRoomsList");
+    socket.emit("getPing");
+    pingInterval = setInterval(() => { ping++; console.log("sex") }, 1);
 }
 
 socket.on("sendRoomsList", (roomsList) => {
@@ -95,6 +100,10 @@ socket.on("sendRoomsList", (roomsList) => {
             joinRoom(room.getAttribute("data-roomName"), room.getAttribute("data-hostUsername"));
         }
     });
+
+    clearInterval(pingInterval);
+    document.getElementById("ping").textContent = `Ping: ${ping}ms`;
+    ping = 0;
 });
 
 setInterval(refreshRoomsList, 1500);

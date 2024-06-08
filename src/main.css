@@ -29,3 +29,8 @@ body {
     left: 15px;
     top: 15px;
 }
+#ping {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+}
