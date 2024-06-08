@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import { io } from "../_snowpack/pkg/socket.io-client.js";
 
 const socket = io("https://guess-the-number-multiplayer.onrender.com/");
 const nicknameDiv = document.getElementById("nickname");
